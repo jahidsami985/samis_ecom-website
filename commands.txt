@@ -1,0 +1,2 @@
+.env file will set during the time of payment gateway
+local setting file creat kora lagba

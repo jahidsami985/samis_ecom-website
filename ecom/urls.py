@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('backend/', include('backend.urls')),
+    path('brand/', views.brand),
 
     path('dashboard/', views.ecom_dashboard, name='dashboard'),
 ]
