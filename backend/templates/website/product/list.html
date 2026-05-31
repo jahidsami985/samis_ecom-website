@@ -1,0 +1,45 @@
+{% extends 'web_base.html' %}
+
+{% block title %} Products | Fico {% endblock %}
+
+{% load static %}
+
+{% block linkcss %}
+<link rel="stylesheet" href="{% static 'website/css/home.css' %}" />
+{% endblock %}
+
+{% block content %}
+<section class="category-featured best-sellers discover_our_products">
+    <div class="container-fluid">
+        <div class="category-box">
+            <div class="best-sellers-text">
+                <h3 class="sub-title">Products</h3>
+            </div>
+            <div class="category-list best-sellers-list">
+                {% for product in products %}
+                    <div class="category-item">
+                        <a href="{% url 'products_details' product.product_slug %}" rel="noopener noreferrer">
+                            {% if product.product_image %}
+                                <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
+                            {% else %}
+                                <img src="{% static 'website/images/products/product1.png' %}" alt="{{ product.product_name }}">
+                            {% endif %}
+                        </a>
+                        <div class="item-text">
+                            <p><a href="{% url 'products_details' product.product_slug %}">{{ product.product_name }}</a></p>
+                            <p style="text-align: center;">BDT {{ product.discount_price|default:product.price }}</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="category-item">
+                        <img src="{% static 'website/images/products/product1.png' %}" alt="Fico product">
+                        <div class="item-text">
+                            <p>Products will appear here.</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
