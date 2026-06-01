@@ -19,9 +19,11 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
+from backend import views as backend_views
 
 urlpatterns = [
-    path('', RedirectView.as_view(pattern_name='home', permanent=False)),
+    path('', backend_views.home, name='home'),
+    path('favicon.ico', RedirectView.as_view(url=settings.STATIC_URL + 'website/images/favicon/favicon.ico', permanent=True)),
     path('admin/', admin.site.urls),
     path('backend/', include('backend.urls')),
     #path('frontend/', include('frontend.urls')),
@@ -29,4 +31,3 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
