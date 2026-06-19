@@ -59,9 +59,9 @@
                     <span class="store-category-image">
                         {% with sample=category.active_products.0 %}
                             {% if category.cat_image %}
-                                <img src="{{ category.cat_image.url }}" alt="{{ category.main_cat_name }}">
+                                <img src="{{ category.cat_image.url }}" alt="{{ category.main_cat_name }}" onerror="this.onerror=null;this.src='{% static 'website/images/products/product1.png' %}';">
                             {% elif sample and sample.product_image %}
-                                <img src="{{ sample.product_image.url }}" alt="{{ category.main_cat_name }}">
+                                <img src="{{ sample.product_image.url }}" alt="{{ category.main_cat_name }}" onerror="this.onerror=null;this.src='{% static 'website/images/products/product1.png' %}';">
                             {% else %}
                                 <img src="{% static 'website/images/products/product1.png' %}" alt="{{ category.main_cat_name }}">
                             {% endif %}
@@ -88,7 +88,7 @@
                 <article class="store-product-card">
                     <a class="store-product-image" href="{% url 'products_details' product.product_slug %}">
                         {% if product.product_image %}
-                            <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
+                            <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" onerror="this.onerror=null;this.src='{% static 'website/images/products/product1.png' %}';">
                         {% else %}
                             <img src="{% static 'website/images/products/product1.png' %}" alt="{{ product.product_name }}">
                         {% endif %}

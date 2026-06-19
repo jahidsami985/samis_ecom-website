@@ -38,7 +38,7 @@
                         <article class="store-product-card">
                             <a class="store-product-image" href="{% url 'products_details' product.product_slug %}">
                                 {% if product.product_image %}
-                                    <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
+                                    <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" onerror="this.onerror=null;this.src='{% static 'website/images/products/product1.png' %}';">
                                 {% else %}
                                     <img src="{% static 'website/images/products/product1.png' %}" alt="{{ product.product_name }}">
                                 {% endif %}

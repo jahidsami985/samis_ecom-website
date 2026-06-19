@@ -14,7 +14,7 @@
         <div class="product-info-box">
             <div class="product-info-left product-info-body">
                 <div class="product-info-top">
-                    {% if product.product_image %}<img src="{{ product.product_image.url }}" alt="{{ product.product_name|default:'' }}">{% endif %}
+                    {% if product.product_image %}<img src="{{ product.product_image.url }}" alt="{{ product.product_name|default:'' }}" onerror="this.onerror=null;this.src='{% static 'website/images/products/product1.png' %}';">{% endif %}
                 </div>
                 {% comment %} {% for related_image in product_related_images %}
                     {% if related_image.image %}

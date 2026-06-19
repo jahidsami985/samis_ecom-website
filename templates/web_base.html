@@ -104,7 +104,7 @@
                                         <td>
                                             <div class="pocket-info-box">
                                                 <div class="pocket-product-image">
-                                                    {% if cart.product.product_image %}<img src="{{ cart.product.product_image.url }}" alt="{{ cart.product.product_name }}">{% endif %}
+                                                    {% if cart.product.product_image %}<img src="{{ cart.product.product_image.url }}" alt="{{ cart.product.product_name }}" onerror="this.onerror=null;this.src='{% static 'website/images/products/product1.png' %}';">{% endif %}
                                                 </div>
                                                 <div class="pocket-text">
                                                     <p>{{ cart.product.product_name }}</p>
