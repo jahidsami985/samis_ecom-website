@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import RedirectView
 
 from backend import views_payment
 from . import views
@@ -18,7 +19,7 @@ urlpatterns = [
     path('product-create/', views.add_new_product, name='add_new_product'),
     path('products/<slug:product_slug>/', views.products_details, name='products_details'),
     path('products/', views.product_web_list, name='product_web_list'),
-   path('', views.home, name='home'),
+    path('', RedirectView.as_view(pattern_name='dashboard', permanent=False)),
 
     # Authentication
     path('login/', views.login_view, name='user_login'),

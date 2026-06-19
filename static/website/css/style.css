@@ -31,15 +31,15 @@ body, html{
 }
 @font-face {
     font-family: 'Spectral-SemiBold';
-    src: url(../fonts/Spectral/Spectral-SemiBold.ttf);
+    src: url(/static/fonts/Montserrat/Montserrat-SemiBold.ttf);
 }
 @font-face {
     font-family: 'Karla-Regular';
-    src: url(../fonts/Karla/Karla-Regular.ttf);
+    src: url(/static/fonts/Montserrat/Montserrat-Regular.ttf);
 }
 @font-face {
     font-family: 'Karla-SemiBold';
-    src: url(../fonts/Karla/Karla-SemiBold.ttf);
+    src: url(/static/fonts/Montserrat/Montserrat-SemiBold.ttf);
 }
 @font-face {
     font-family: 'avantgarde-Bk-BT';
@@ -131,7 +131,7 @@ header.header {
     height: 60px;
     position: relative;
     margin-bottom: -60px;
-    background-image: url(/static/images/bg_header.png);
+    background-image: url(/static/website/images/bg_header.png);
     background-repeat: no-repeat;
     background-repeat: repeat-x;
     z-index: 2;
@@ -1976,6 +1976,178 @@ section.about-section {
 }
 .discover_our_products .category-item a img:last-child{
     display: block;
+}
+
+/* samis e Commerce site storefront header/footer */
+:root {
+    --site-ink: #151515;
+    --site-muted: #5d665f;
+    --site-accent: #2f7d68;
+    --site-accent-dark: #245f50;
+    --site-gold: #f2b84b;
+    --site-surface: #f6f8f3;
+    --site-border: #dce6d7;
+}
+
+header.header {
+    background-color: rgba(255, 255, 255, .94);
+    border-bottom: 1px solid var(--site-border);
+    box-shadow: 0 6px 24px rgba(15, 23, 42, .06);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header .header-top {
+    align-items: center;
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+.site-brand {
+    align-items: center;
+    color: var(--site-ink);
+    display: inline-flex;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.site-brand:hover {
+    color: var(--site-accent-dark);
+}
+
+.site-brand-mark {
+    align-items: center;
+    background: linear-gradient(135deg, var(--site-accent), var(--site-gold));
+    border-radius: 8px;
+    color: #ffffff;
+    display: inline-flex;
+    font-family: 'Karla-SemiBold';
+    font-size: 22px;
+    height: 46px;
+    justify-content: center;
+    line-height: 1;
+    width: 46px;
+}
+
+.site-brand-text {
+    display: inline-block;
+    font-family: 'Spectral-SemiBold';
+    font-size: 28px;
+    line-height: 1.1;
+    max-width: 270px;
+}
+
+.main-nav-menu > ul,
+.nav-top-right > ul {
+    align-items: center;
+}
+
+.main-nav-menu > ul > li > a,
+.nav-top-right > ul > li > a {
+    color: var(--site-ink);
+    font-family: 'Karla-SemiBold';
+    font-size: 15px;
+}
+
+.main-nav-menu > ul > li > a:hover,
+.category-nav-menu a:hover,
+.footer-nav-menu a:hover {
+    color: var(--site-accent-dark);
+}
+
+.category-nav-item {
+    position: relative;
+}
+
+.category-nav-menu {
+    background: #ffffff;
+    border: 1px solid var(--site-border);
+    border-radius: 8px;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, .12);
+    display: none !important;
+    left: 0;
+    line-height: 1.2 !important;
+    min-width: 270px;
+    padding: 10px 0 !important;
+    position: absolute;
+    top: 100%;
+    z-index: 1001;
+}
+
+.category-nav-item:hover .category-nav-menu,
+.category-nav-item:focus-within .category-nav-menu {
+    display: block !important;
+}
+
+.category-nav-menu li {
+    margin-left: 0 !important;
+}
+
+.category-nav-menu a {
+    align-items: center;
+    color: var(--site-ink);
+    display: flex !important;
+    justify-content: space-between;
+    padding: 10px 16px !important;
+    text-decoration: none;
+}
+
+.category-nav-menu span {
+    background: var(--site-surface);
+    border-radius: 999px;
+    color: var(--site-muted);
+    font-size: 12px;
+    padding: 3px 8px;
+}
+
+.footer {
+    border-top: 1px solid var(--site-border);
+}
+
+.footer-brand-block {
+    margin-bottom: 18px;
+    max-width: 520px;
+}
+
+.footer-brand {
+    color: var(--site-ink);
+    display: inline-block;
+    font-family: 'Spectral-SemiBold';
+    font-size: 24px;
+    margin-bottom: 6px;
+    text-decoration: none;
+}
+
+.footer-brand-block p {
+    color: var(--site-muted);
+    font-size: 14px;
+}
+
+@media only screen and (max-width: 991px) {
+    .header .header-top,
+    .nav-top-left {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .header .header-top {
+        flex-wrap: wrap;
+    }
+
+    .site-brand-text {
+        font-size: 22px;
+        max-width: 220px;
+    }
+
+    .main-nav-menu > ul {
+        flex-wrap: wrap;
+        line-height: 34px;
+    }
+
+    .category-nav-menu {
+        min-width: 230px;
+    }
 }
 @media only screen and (min-width: 991px) {
     .explore-products-box {

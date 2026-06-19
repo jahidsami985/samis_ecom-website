@@ -53,7 +53,7 @@
                             <tr>
                                 <td class="text-center">{{ forloop.counter }}</td>
                                 <td class="text-center">
-                                    <span><a href="">
+                                    <span><a href="{% url 'product_detail' data.id %}">
                                         {% if data.product_image and data.product_image.url %}
                                             <img src="{{ data.product_image.url }}" alt="user image" style="width: 50px; height: 50px;">
                                         {% else %}
@@ -62,11 +62,11 @@
                                     </span>
                                 </td>
                                 <td class="text-left">
-                                    <a class="text-underline" href="">{{ data.product_name }}</a>
+                                    <a class="text-underline" href="{% url 'product_detail' data.id %}">{{ data.product_name }}</a>
                                 </td>
                                 
                                 <td class="text-left">{{ data.main_category.main_cat_name }}</td>
-                                <td class="text-left">{{ data.sub_category.sub_cat_name }}</td>
+                                <td class="text-left">{{ data.sub_category.sub_cat_name|default:"-" }}</td>
                                 <td class="text-left">{{ data.price }}</td>
                                 <td class="text-left">{{ data.total_views }}</td>
                                 <td class="text-left">{{ data.created_at|date:"d-M-Y" }}</td>
@@ -74,7 +74,7 @@
                                     {% if data.is_active %}
                                         <span class="active"><img src="/static/images/icons/ellipse-active.svg" alt="active"></span>Active
                                     {% else %}
-                                        <span class="inactive"><img src="/static/images/icons/ellipse-inactive.svg" alt="inactive"></span>Inactive
+                                        <span class="inactive"></span>Inactive
                                     {% endif %}
                                 </td>
                                    <td class="text-center">
@@ -92,7 +92,7 @@
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="8" class="text-center">No Data found.</td>
+                                <td colspan="10" class="text-center">No Data found.</td>
                             </tr>
                         {% endfor %}
                         </table>

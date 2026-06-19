@@ -8,6 +8,10 @@ var sticky_menu = document.getElementById("header_sticky");
 $(window).scroll(function() {
     const scrollTop = $(window).scrollTop();
     
+    if (!sticky_menu) {
+        return;
+    }
+
     if (scrollTop > 300) {
         sticky_menu.classList.add('sticky');
     } else if( scrollTop < 100){
@@ -39,10 +43,7 @@ function cart_open() {
 
     const pocketBox = document.getElementById('cart-pocket-box');
     const pocketContainer = document.getElementById('pocket-container');
-    console.log(pocketBox, pocketContainer);
-    
     if (!pocketBox || !pocketContainer) {
-        console.error('Required elements not found.');
         return;
     }
 
@@ -100,7 +101,10 @@ function closeCartPopup() {
 }
 
 setTimeout(function() {
-    document.querySelector(".messages").style.display = "none";
+    const messages = document.querySelector(".messages");
+    if (messages) {
+        messages.style.display = "none";
+    }
 }, 3000);
 
 const errorElements = document.querySelectorAll('.error');

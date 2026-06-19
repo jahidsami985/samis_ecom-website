@@ -39,51 +39,42 @@
                                 <th class="text-center" >#</th>
                                 <th class="text-center">Image</th>
                                 <th class="text-left">Name</th>
-                                <th class="text-left">Main Category</th>
-                                
-                                <th class="text-left">Price</th>
-                                <th class="text-left">Total View</th>
+                                <th class="text-left">Slug</th>
+                                <th class="text-left">Ordering</th>
                                 <th class="text-left">Created Date</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Action</th>
                             </tr>
                           
-                        {% comment %} {% for data in products %}
+                        {% for data in product_main_categories %}
                             <tr>
                                 <td class="text-center">{{ forloop.counter }}</td>
                                 <td class="text-center">
-                                    <span><a href="{% url 'product_related_image' data.id %}">
-                                        {% if data.product_image and data.product_image.url %}
-                                            <img src="{{ data.product_image.url }}" alt="user image" style="width: 50px; height: 50px;">
+                                    <span>
+                                        {% if data.cat_image %}
+                                            <img src="{{ data.cat_image.url }}" alt="{{ data.main_cat_name }}" style="width: 50px; height: 50px;">
                                         {% else %}
-                                            <img src="/static/images/icons/user-default.png" alt="user image">
-                                        {% endif %}</a>
+                                            <img src="/static/images/icons/user-default.png" alt="{{ data.main_cat_name }}">
+                                        {% endif %}
                                     </span>
                                 </td>
                                 <td class="text-left">
-                                    <a class="text-underline" href="">{{ data.product_name }}</a>
+                                    <a class="text-underline" href="{% url 'product_main_category_details' data.id %}">{{ data.main_cat_name }}</a>
                                 </td>
-                                
-                                <td class="text-left">{{ data.main_category.main_cat_name }}</td>
-                                <td class="text-left">{{ data.price }}</td>
-                                <td class="text-left">{{ data.total_views }}</td>
+                                <td class="text-left">{{ data.cat_slug }}</td>
+                                <td class="text-left">{{ data.cat_ordering|default:0 }}</td>
                                 <td class="text-left">{{ data.created_at|date:"d-M-Y" }}</td>
                                 <td class="text-center">
                                     {% if data.is_active %}
                                         <span class="active"><img src="/static/images/icons/ellipse-active.svg" alt="active"></span>Active
                                     {% else %}
-                                        <span class="inactive"><img src="/static/images/icons/ellipse-inactive.svg" alt="inactive"></span>Inactive
+                                        <span class="inactive"></span>Inactive
                                     {% endif %}
                                 </td>
                                   <td class="text-center">
                                     <span class="more">
-                                        <a href="{% url 'product_detail' data.id %}">
+                                        <a href="{% url 'product_main_category_details' data.id %}">
                                             <i class="fas fa-eye font-weight500"></i>
-                                        </a>
-                                    </span>
-                                    <span class="more">
-                                        <a href="{% url 'edit_product' data.id %}">
-                                            <i class="fas fa-edit font-weight500"></i>
                                         </a>
                                     </span>
                                 </td>
@@ -92,7 +83,7 @@
                             <tr>
                                 <td colspan="8" class="text-center">No Data found.</td>
                             </tr>
-                        {% endfor %} {% endcomment %}
+                        {% endfor %}
                         </table>
                     </div>
 
@@ -102,9 +93,9 @@
                     <div class="col-md-12 text-end"> 
                         <nav aria-label="navigation">
                             <ul class="pagination justify-content-center">
-                                {% if products.has_previous %}
+                                {% if product_main_categories.has_previous %}
                                     <li class="page-item">
-                                        <a class="page-link" href="?page={{ products.previous_page_number }}{% if params %}&{{ params }}{% endif %}" aria-label="Previous">
+                                        <a class="page-link" href="?page={{ product_main_categories.previous_page_number }}{% if params %}&{{ params }}{% endif %}" aria-label="Previous">
                                             <span aria-hidden="true">&laquo;</span>
                                             <span class="sr-only">Previous</span>
                                         </a>
@@ -118,7 +109,7 @@
                                 {% endif %}
 
                                 {% for i in paginator_list %}
-                                    <li class="page-item {% if products.number == i %}active{% endif %}">
+                                    <li class="page-item {% if product_main_categories.number == i %}active{% endif %}">
                                         <a class="page-link" href="?page={{ i }}{% if params %}&{{ params }}{% endif %}">{{ i }}</a>
                                     </li>
                                 {% endfor %}
@@ -129,9 +120,9 @@
                                     </li>
                                 {% endif %}
             
-                                {% if products.has_next %}
+                                {% if product_main_categories.has_next %}
                                     <li class="page-item">
-                                        <a class="page-link" href="?page={{ products.next_page_number }}{% if params %}&{{ params }}{% endif %}" aria-label="Next">
+                                        <a class="page-link" href="?page={{ product_main_categories.next_page_number }}{% if params %}&{{ params }}{% endif %}" aria-label="Next">
                                         <span aria-hidden="true">&raquo;</span>
                                         <span class="sr-only">Next</span>
                                         </a>

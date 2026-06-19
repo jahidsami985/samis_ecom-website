@@ -1,45 +1,62 @@
 {% extends 'web_base.html' %}
 
-{% block title %} Products | Fico {% endblock %}
+{% block title %}Products | samis e Commerce site{% endblock %}
 
 {% load static %}
 
-{% block linkcss %}
-<link rel="stylesheet" href="{% static 'website/css/home.css' %}" />
-{% endblock %}
-
 {% block content %}
-<section class="category-featured best-sellers discover_our_products">
+<section class="catalog-hero">
     <div class="container-fluid">
-        <div class="category-box">
-            <div class="best-sellers-text">
-                <h3 class="sub-title">Products</h3>
-            </div>
-            <div class="category-list best-sellers-list">
-                {% for product in products %}
-                    <div class="category-item">
-                        <a href="{% url 'products_details' product.product_slug %}" rel="noopener noreferrer">
-                            {% if product.product_image %}
-                                <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
-                            {% else %}
-                                <img src="{% static 'website/images/products/product1.png' %}" alt="{{ product.product_name }}">
-                            {% endif %}
-                        </a>
-                        <div class="item-text">
-                            <p><a href="{% url 'products_details' product.product_slug %}">{{ product.product_name }}</a></p>
-                            <p style="text-align: center;">BDT {{ product.discount_price|default:product.price }}</p>
-                        </div>
-                    </div>
-                {% empty %}
-                    <div class="category-item">
-                        <img src="{% static 'website/images/products/product1.png' %}" alt="Fico product">
-                        <div class="item-text">
-                            <p>Products will appear here.</p>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
+        <div class="catalog-hero-content">
+            <p class="store-eyebrow">Category-first shopping</p>
+            <h1>Products</h1>
+            <p>Every product is shown inside its category, so Furniture, Phones, and T-Shirts stay easy to browse.</p>
         </div>
+    </div>
+</section>
+
+<section class="catalog-wrap" id="categories">
+    <div class="container-fluid">
+        <div class="catalog-tabs">
+            {% for category in main_categories %}
+                <a href="#category-{{ category.cat_slug }}">{{ category.main_cat_name }}</a>
+            {% endfor %}
+        </div>
+
+        {% for category in main_categories %}
+            <section class="catalog-category-section" id="category-{{ category.cat_slug }}">
+                <div class="catalog-category-heading">
+                    <div>
+                        <p class="store-eyebrow">Category</p>
+                        <h2>{{ category.main_cat_name }}</h2>
+                    </div>
+                    <span>{{ category.active_products|length }} product{{ category.active_products|length|pluralize }}</span>
+                </div>
+
+                <div class="store-product-grid">
+                    {% for product in category.active_products %}
+                        <article class="store-product-card">
+                            <a class="store-product-image" href="{% url 'products_details' product.product_slug %}">
+                                {% if product.product_image %}
+                                    <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
+                                {% else %}
+                                    <img src="{% static 'website/images/products/product1.png' %}" alt="{{ product.product_name }}">
+                                {% endif %}
+                            </a>
+                            <div class="store-product-info">
+                                <p class="store-product-category">{{ category.main_cat_name }}</p>
+                                <h3><a href="{% url 'products_details' product.product_slug %}">{{ product.product_name }}</a></h3>
+                                <p class="store-product-price">BDT {{ product.discount_price|default:product.price }}</p>
+                            </div>
+                        </article>
+                    {% empty %}
+                        <div class="store-empty-card">No active products in this category yet.</div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% empty %}
+            <div class="store-empty-card">Categories will appear here after products are added.</div>
+        {% endfor %}
     </div>
 </section>
 {% endblock %}

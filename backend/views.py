@@ -16,10 +16,15 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db import transaction
+from django.db.models import Prefetch
 
 
 from backend.models import  Customer, Product,EmailOTP,OrderCart
 from backend.common_func import checkUserPermission
+
+
+def optional_value(value):
+    return None if value in (None, '') else value
 
 def ecom_dashboard(request):
    
@@ -76,11 +81,15 @@ def product_main_category_list_view(request):
     product_main_categories = ProductMainCategory.objects.filter(is_active=True).order_by('-id')
     page_number = request.GET.get('page', 1)
     product_main_categories, paginator_list, last_page_number = paginate_data(request, page_number, product_main_categories)
+    params = request.GET.copy()
+    params.pop('page', None)
 
     context = {
+        'first_page_number': 1,
         'paginator_list': paginator_list,
         'last_page_number': last_page_number,
         'product_main_categories': product_main_categories,
+        'params': params.urlencode(),
     }
 
     return render(request, "product/main_category_list.html", context)  
@@ -93,12 +102,17 @@ def add_product_main_category(request):
     if request.method == 'POST':
         main_cat_name = request.POST.get('main_cat_name')
         cat_slug = request.POST.get('cat_slug')
-
+        cat_image = request.FILES.get('cat_image')
         description = request.POST.get('description')
+
+        if not main_cat_name:
+            messages.error(request, 'Category name is required.')
+            return redirect('add_product_main_category')
         
         product_main_category = ProductMainCategory(
             main_cat_name=main_cat_name,
             cat_slug=cat_slug,
+            cat_image=cat_image,
             description=description,
             created_by=request.user
         )
@@ -129,11 +143,15 @@ def product_list(request):
     products = Product.objects.filter(is_active=True).order_by('-id')
     page_number = request.GET.get('page', 1)
     products, paginator_list, last_page_number = paginate_data(request, page_number, products)
+    params = request.GET.copy()
+    params.pop('page', None)
 
     context = {
+        'first_page_number': 1,
         'paginator_list': paginator_list,
         'last_page_number': last_page_number,
         'products': products,
+        'params': params.urlencode(),
     }
 
     return render(request, "product/product_list.html", context)
@@ -159,13 +177,26 @@ def product_edit(request, pk):
     product = get_object_or_404(Product, pk=pk)
 
     if request.method == 'POST':
-        product.product_name = request.POST.get('product_name')
-        product.price = request.POST.get('price')
-        product.stock = request.POST.get('stock')
+        product_name = request.POST.get('product_name')
+        price = request.POST.get('price')
+        stock = request.POST.get('stock')
+        main_category_id = request.POST.get('main_category')
+        sub_category_id = request.POST.get('sub_category')
+
+        if not product_name or not price or not stock or not main_category_id or not sub_category_id:
+            messages.error(request, 'Name, category, sub category, price, and stock are required.')
+            return redirect('edit_product', pk=product.pk)
+
+        product.product_name = product_name
+        product.price = price
+        product.stock = stock
         product.description = request.POST.get('description')
-        product.discount_percentage = request.POST.get('discount_percentage')
-        product.main_category = get_object_or_404(ProductMainCategory, pk=request.POST.get('main_category'))
-        product.sub_category = get_object_or_404(ProductSubCategory, pk=request.POST.get('sub_category'))
+        product.discount_percentage = optional_value(request.POST.get('discount_percentage'))
+        product.discount_price = optional_value(request.POST.get('discount_price'))
+        product.main_category = get_object_or_404(ProductMainCategory, pk=main_category_id)
+        product.sub_category = get_object_or_404(ProductSubCategory, pk=sub_category_id)
+        if request.FILES.get('product_image'):
+            product.product_image = request.FILES.get('product_image')
         product.updated_by = request.user
         product.save()
         
@@ -189,8 +220,8 @@ def add_new_product(request):
         product_name = request.POST.get('product_name')
         price = request.POST.get('price')
         stock = request.POST.get('stock')
-        discount_price = request.POST.get('discount_price')
-        discount_percentage = request.POST.get('discount_percentage')
+        discount_price = optional_value(request.POST.get('discount_price'))
+        discount_percentage = optional_value(request.POST.get('discount_percentage'))
         description = request.POST.get('description')
         main_category_id = request.POST.get('main_category')
         sub_category_id = request.POST.get('sub_category')
@@ -238,9 +269,12 @@ def add_new_product(request):
 
 def home(request):
 
-    main_categories= ProductMainCategory.objects.filter(is_active=True)
+    product_queryset = Product.objects.filter(is_active=True).select_related('main_category', 'sub_category').order_by('-id')
+    main_categories = ProductMainCategory.objects.filter(is_active=True).prefetch_related(
+        Prefetch('products', queryset=product_queryset, to_attr='active_products')
+    ).order_by('cat_ordering', 'main_cat_name')
 
-    featured_products = Product.objects.filter(is_featured=True, is_active=True).order_by('-id')[:10]
+    featured_products = product_queryset.order_by('-is_featured', '-id')[:8]
 
     context = {
         'main_categories': main_categories,
@@ -356,16 +390,37 @@ def add_or_update_cart(request):
     if is_authenticated:
         if request.method == 'POST':
             
-            customer=Customer.objects.filter(user=request.user).first()
+            customer=Customer.objects.filter(user=request.user, is_active=True).first()
+            if not customer:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Please log in with an active customer account before adding items to cart.',
+                    'is_authenticated': is_authenticated,
+                }, status=403)
             
             product_id = request.POST.get('product_id')
-            quantity = int(request.POST.get('quantity', 0))
+            product = Product.objects.filter(id=product_id, is_active=True).first()
+            if not product:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Product not found.',
+                    'is_authenticated': is_authenticated,
+                }, status=404)
+
+            try:
+                quantity = int(request.POST.get('quantity', 0))
+            except (TypeError, ValueError):
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Invalid quantity.',
+                    'is_authenticated': is_authenticated,
+                }, status=400)
 
             try:
                 isRemoved = False
 
                 cart_item, created = OrderCart.objects.update_or_create(
-                    customer=customer, product_id=product_id, is_order=False, is_active=True,
+                    customer=customer, product=product, is_order=False, is_active=True,
                     defaults={'quantity': quantity}
                 )
                 
@@ -403,9 +458,13 @@ def add_or_update_cart(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request', 'is_authenticated': is_authenticated,}, status=400)
 
 def product_web_list(request):
-    products = Product.objects.filter(is_active=True).order_by('-id')
+    products = Product.objects.filter(is_active=True).select_related('main_category', 'sub_category').order_by('-id')
+    main_categories = ProductMainCategory.objects.filter(is_active=True).prefetch_related(
+        Prefetch('products', queryset=products, to_attr='active_products')
+    ).order_by('cat_ordering', 'main_cat_name')
     context = {
         'products': products,
+        'main_categories': main_categories,
     }
     return render(request, 'website/product/list.html', context)
 
@@ -472,16 +531,37 @@ def add_or_update_cart(request):
     if is_authenticated:
         if request.method == 'POST':
             
-            customer=Customer.objects.filter(user=request.user).first()
+            customer=Customer.objects.filter(user=request.user, is_active=True).first()
+            if not customer:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Please log in with an active customer account before adding items to cart.',
+                    'is_authenticated': is_authenticated,
+                }, status=403)
             
             product_id = request.POST.get('product_id')
-            quantity = int(request.POST.get('quantity', 0))
+            product = Product.objects.filter(id=product_id, is_active=True).first()
+            if not product:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Product not found.',
+                    'is_authenticated': is_authenticated,
+                }, status=404)
+
+            try:
+                quantity = int(request.POST.get('quantity', 0))
+            except (TypeError, ValueError):
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Invalid quantity.',
+                    'is_authenticated': is_authenticated,
+                }, status=400)
 
             try:
                 isRemoved = False
 
                 cart_item, created = OrderCart.objects.update_or_create(
-                    customer=customer, product_id=product_id, is_order=False, is_active=True,
+                    customer=customer, product=product, is_order=False, is_active=True,
                     defaults={'quantity': quantity}
                 )
                 

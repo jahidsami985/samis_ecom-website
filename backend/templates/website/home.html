@@ -1,79 +1,108 @@
-
 {% extends 'web_base.html' %}
 
-{% block title %} Fico {% endblock %}
+{% block title %}samis e Commerce site{% endblock %}
 
 {% load static %}
 
-{% block linkcss %}
-<!--For Home-->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-<link rel="stylesheet" href="{% static 'website/css/home.css' %}" />
-
-{% endblock %}
-
-
 {% block content %}
-<section class="artical hero-section" style="background-color: rgba(255, 255, 0, .2);">
-    <div class="hero-container">
-        <div class="banner-box">
-            <div class="swiper banner-swiper">
-                <div class="swiper-wrapper">
-                    <div class="swiper-slide">
-                        <a href="{% url 'product_web_list' %}">
-                            <img class="desktop" src="{% static 'website/images/banner/banner-web.png' %}" alt="Fico">
-                            <img class="mobile" src="{% static 'website/images/banner/banner-mobile.png' %}" alt="Fico">
-                        </a>
-                    </div>
-                </div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-pagination"></div>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-
-<section class="category-featured best-sellers discover_our_products">
+<section class="store-hero">
     <div class="container-fluid">
-        <div class="category-box">
-            <div class="best-sellers-text">
-                <h3 class="sub-title">Discover Our Products</h3>
-            </div>
-            <div class="category-list best-sellers-list">
-                {% for product in featured_products %}
-                    <div class="category-item">
-                        <a href="{% url 'products_details' product.product_slug %}" rel="noopener noreferrer">
-                            <img src="/media/{{ product.product_image }}" alt="{{ product.product_name }}">
-
-                        </a>
-                        <div class="item-text">
-                            <p><a href="{% url 'products_details' product.product_slug %}">{{ product.product_name }}</a></p>
-                            <p style="text-align: center;">BDT {{ product.discount_price|default:product.price }}</p>
-                        </div>
-                    </div>
-                {% endfor %}
+        <div class="store-hero-content">
+            <p class="store-eyebrow">Fresh categories. Simple shopping. Local style.</p>
+            <h1>samis e Commerce site</h1>
+            <p class="store-hero-copy">
+                Discover furniture, phones, fashion, and everyday products arranged by clear categories so every item is easy to find.
+            </p>
+            <div class="store-hero-actions">
+                <a class="store-btn store-btn-dark" href="{% url 'product_web_list' %}">Shop Products</a>
+                <a class="store-btn store-btn-light" href="#about-site">About the Site</a>
             </div>
         </div>
     </div>
 </section>
 
-{% endblock %}
+<section class="store-about" id="about-site">
+    <div class="container-fluid">
+        <div class="store-split">
+            <div class="store-section-heading">
+                <p class="store-eyebrow">About the site</p>
+                <h2>A cleaner shopping home for mixed product categories</h2>
+                <p class="store-section-copy">The site is organized around real database categories, so browsing stays simple even as the catalog grows.</p>
+            </div>
+            <div class="store-about-grid">
+                <div>
+                <h3>Organized Catalog</h3>
+                <p>Products are grouped by their own category, including Furniture, Phone, and Men's Premium Cotton T-Shirt.</p>
+                </div>
+                <div>
+                <h3>Easy Browsing</h3>
+                <p>Use the header category menu or category cards to jump directly to the products you want.</p>
+                </div>
+                <div>
+                <h3>Simple Checkout</h3>
+                <p>Add products to cart, review totals, and continue through the checkout flow from one storefront.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-{% block linkScript %}
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script src="{% static 'js/event.js' %}"></script>
+<section class="store-categories" id="categories">
+    <div class="container-fluid">
+        <div class="store-section-heading">
+            <p class="store-eyebrow">Shop by category</p>
+            <h2>Product Categories</h2>
+        </div>
+        <div class="store-category-grid">
+            {% for category in main_categories %}
+                <a class="store-category-card" href="{% url 'product_web_list' %}#category-{{ category.cat_slug }}">
+                    <span class="store-category-image">
+                        {% with sample=category.active_products.0 %}
+                            {% if category.cat_image %}
+                                <img src="{{ category.cat_image.url }}" alt="{{ category.main_cat_name }}">
+                            {% elif sample and sample.product_image %}
+                                <img src="{{ sample.product_image.url }}" alt="{{ category.main_cat_name }}">
+                            {% else %}
+                                <img src="{% static 'website/images/products/product1.png' %}" alt="{{ category.main_cat_name }}">
+                            {% endif %}
+                        {% endwith %}
+                    </span>
+                    <span class="store-category-name">{{ category.main_cat_name }}</span>
+                    <span class="store-category-count">{{ category.active_products|length }} product{{ category.active_products|length|pluralize }}</span>
+                </a>
+            {% empty %}
+                <div class="store-empty-card">Categories will appear here after products are added.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
 
-<script>
-    var swiper = new Swiper(".newCollections", {
-        slidesPerView: "auto",
-        spaceBetween: 15,
-        autoplay: {
-            delay: 5500,
-            disableOnInteraction: false,
-        },
-    });
-</script>
+<section class="store-products-section">
+    <div class="container-fluid">
+        <div class="store-section-heading">
+            <p class="store-eyebrow">Featured picks</p>
+            <h2>Discover Our Products</h2>
+        </div>
+        <div class="store-product-grid">
+            {% for product in featured_products %}
+                <article class="store-product-card">
+                    <a class="store-product-image" href="{% url 'products_details' product.product_slug %}">
+                        {% if product.product_image %}
+                            <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
+                        {% else %}
+                            <img src="{% static 'website/images/products/product1.png' %}" alt="{{ product.product_name }}">
+                        {% endif %}
+                    </a>
+                    <div class="store-product-info">
+                        <p class="store-product-category">{{ product.main_category.main_cat_name }}</p>
+                        <h3><a href="{% url 'products_details' product.product_slug %}">{{ product.product_name }}</a></h3>
+                        <p class="store-product-price">BDT {{ product.discount_price|default:product.price }}</p>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="store-empty-card">Products will appear here after they are added.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
 {% endblock %}

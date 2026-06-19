@@ -1,6 +1,8 @@
 
 
-from backend.models import Customer, OrderCart, UserPermission
+from django.db.models import Count, Q
+
+from backend.models import Customer, OrderCart, ProductMainCategory, UserPermission
 from backend.views import cart_amount_summary
 
 
@@ -27,3 +29,13 @@ def get_cart_item(request):
 
     return {'cart_item_count': len(cart_items), 'cart_items': cart_items, 'amount_summary': amount_summary}
 
+
+def storefront_catalog(request):
+    try:
+        categories = ProductMainCategory.objects.filter(is_active=True).annotate(
+            product_count=Count('products', filter=Q(products__is_active=True))
+        ).order_by('cat_ordering', 'main_cat_name')
+    except Exception:
+        categories = []
+
+    return {'storefront_categories': categories}

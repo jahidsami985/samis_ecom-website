@@ -5,6 +5,7 @@ except ImportError:
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 
 from uuid import uuid4
 
