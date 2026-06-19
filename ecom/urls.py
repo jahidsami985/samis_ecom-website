@@ -20,6 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
 from backend import views as backend_views
+from django.views.static import serve
 
 urlpatterns = [
     path('', backend_views.home, name='home'),
@@ -27,6 +28,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('backend/', include('backend.urls')),
     #path('frontend/', include('frontend.urls')),
+    path("media/<path:path>", serve, {"document_root": settings.MEDIA_ROOT}),
 ]
 
 if settings.DEBUG:
