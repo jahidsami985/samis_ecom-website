@@ -17,6 +17,14 @@ def env_list(name):
     return [item.strip() for item in os.environ.get(name, "").split(",") if item.strip()]
 
 
+def env_value(*names):
+    for name in names:
+        value = os.environ.get(name)
+        if value is not None:
+            return value.strip()
+    return None
+
+
 def mysql_ca_path():
     ca_content = (
         os.environ.get("MYSQL_SSL_CA_CONTENT")
@@ -163,11 +171,11 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": DB_ENGINE,
-            "NAME": os.environ.get("MYSQL_DATABASE") or os.environ.get("DB_NAME"),
-            "USER": os.environ.get("MYSQL_USER") or os.environ.get("DB_USER"),
-            "PASSWORD": os.environ.get("MYSQL_PASSWORD") or os.environ.get("DB_PASSWORD"),
-            "HOST": os.environ.get("MYSQL_HOST") or os.environ.get("DB_HOST"),
-            "PORT": os.environ.get("MYSQL_PORT") or os.environ.get("DB_PORT"),
+            "NAME": env_value("MYSQL_DATABASE", "DB_NAME"),
+            "USER": env_value("MYSQL_USER", "DB_USER"),
+            "PASSWORD": env_value("MYSQL_PASSWORD", "DB_PASSWORD"),
+            "HOST": env_value("MYSQL_HOST", "DB_HOST"),
+            "PORT": env_value("MYSQL_PORT", "DB_PORT"),
             "OPTIONS": mysql_options,
         }
     }
