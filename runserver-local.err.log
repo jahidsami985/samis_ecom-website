@@ -1,0 +1,51 @@
+[23/Jul/2026 02:05:20] "GET / HTTP/1.1" 200 11426
+[23/Jul/2026 02:05:20,259] - Broken pipe from ('127.0.0.1', 52588)
+[23/Jul/2026 02:05:40] "GET /admin/ HTTP/1.1" 302 0
+[23/Jul/2026 02:05:41] "GET /backend/products/ HTTP/1.1" 200 9400
+[23/Jul/2026 02:05:41,500] - Broken pipe from ('127.0.0.1', 57576)
+[23/Jul/2026 02:05:42] "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4158
+[23/Jul/2026 02:05:42,518] - Broken pipe from ('127.0.0.1', 57577)
+[23/Jul/2026 02:08:27] "GET / HTTP/1.1" 200 11426
+[23/Jul/2026 02:08:27] "GET /static/website/css/media-query.css HTTP/1.1" 200 4876
+[23/Jul/2026 02:08:27] "GET /static/website/css/storefront.css HTTP/1.1" 200 14581
+[23/Jul/2026 02:08:27] "GET /static/website/css/all.min.css HTTP/1.1" 200 102217
+[23/Jul/2026 02:08:27] "GET /static/website/css/style.css HTTP/1.1" 200 52070
+[23/Jul/2026 02:08:27] "GET /static/website/css/bootstrap.min.css HTTP/1.1" 200 232948
+[23/Jul/2026 02:08:27] "GET /static/website/images/icons/hum-baarger.svg HTTP/1.1" 200 337
+[23/Jul/2026 02:08:27] "GET /static/website/images/icons/user-icon.svg HTTP/1.1" 200 1949
+[23/Jul/2026 02:08:27] "GET /static/website/images/icons/search.svg HTTP/1.1" 200 1400
+[23/Jul/2026 02:08:27] "GET /static/website/images/icons/shopping-cart.svg HTTP/1.1" 200 1883
+[23/Jul/2026 02:08:27] "GET /static/website/images/products/product1.png HTTP/1.1" 200 22837
+[23/Jul/2026 02:08:27] "GET /static/website/images/banner/banner-web.png HTTP/1.1" 200 124003
+[23/Jul/2026 02:08:27] "GET /static/website/js/custom_dropdown.js HTTP/1.1" 200 3635
+[23/Jul/2026 02:08:27] "GET /static/website/js/cart_operation.js HTTP/1.1" 200 8670
+[23/Jul/2026 02:08:27] "GET /static/website/js/bootstrap.bundle.min.js HTTP/1.1" 200 80615
+[23/Jul/2026 02:08:27] "GET /static/fonts/Montserrat/Montserrat-Regular.ttf HTTP/1.1" 200 197976
+[23/Jul/2026 02:08:27] "GET /static/fonts/Montserrat/Montserrat-SemiBold.ttf HTTP/1.1" 200 198204
+[23/Jul/2026 02:08:27] "GET /static/website/js/jquery-3.6.4.min.js HTTP/1.1" 200 89795
+[23/Jul/2026 02:08:28] "GET /favicon.ico HTTP/1.1" 301 0
+[23/Jul/2026 02:08:28] "GET /static/website/images/favicon/favicon.ico HTTP/1.1" 200 15406
+[23/Jul/2026 02:11:23] "GET /backend/products/ HTTP/1.1" 200 9400
+[23/Jul/2026 02:26:18] "GET / HTTP/1.1" 200 11426
+[23/Jul/2026 02:30:26] "GET /backend/products/ HTTP/1.1" 200 18350
+[23/Jul/2026 02:30:26] "GET / HTTP/1.1" 200 19954
+[23/Jul/2026 02:30:26,246] - Broken pipe from ('127.0.0.1', 53927)
+[23/Jul/2026 02:30:26,246] - Broken pipe from ('127.0.0.1', 53928)
+[23/Jul/2026 02:30:31] "GET / HTTP/1.1" 200 19954
+[23/Jul/2026 02:30:32] "GET /media/ecommerce/product_images/0901013_oversized-plain-t-shirt-silver-ash_xifzoOR.webp HTTP/1.1" 200 16388
+[23/Jul/2026 02:30:32] "GET /media/ecommerce/product_images/HLB1ZjLZRAzoK1RjSZFlq6yi4VXac.avif HTTP/1.1" 200 33732
+[23/Jul/2026 02:30:32] "GET /media/ecommerce/product_images/eng_pm_Apple-iPhone-7-A1778-2GB-32GB-Black-Pre-owned-iOS-77658__n9wwLBo.jpg HTTP/1.1" 200 60282
+[23/Jul/2026 02:30:32] "GET /media/ecommerce/product_images/fg-1776928937_DmAXhyb.webp HTTP/1.1" 200 44694
+[23/Jul/2026 02:30:32] "GET /media/ecommerce/product_images/iPhone_12_family_AWxUssP.webp HTTP/1.1" 200 20388
+[23/Jul/2026 02:30:32] "GET /media/ecommerce/product_images/Artboard_7_31_OdjBQhn.webp HTTP/1.1" 200 35678
+[23/Jul/2026 02:30:32] "GET /media/ecommerce/product_images/HATIL_Sofa_Set_Veteran-336_7E7daNE.webp HTTP/1.1" 200 73566
+[23/Jul/2026 02:30:32] "GET /media/ecommerce/category_images/iPhone-15-Pro-15-pro-max-Black-Titanium-price-in-Bangladesh-M_dVixzFQ.webp HTTP/1.1" 200 7530
+[23/Jul/2026 02:30:32] "GET /media/ecommerce/product_images/iPhone-15-Pro-15-pro-max-Black-Titanium-price-in-Bangladesh-MC_xGJOt1q.webp HTTP/1.1" 200 7530
+[23/Jul/2026 02:30:42] "GET /backend/products/ HTTP/1.1" 200 18350
+[23/Jul/2026 02:31:18] "GET /backend/products/ HTTP/1.1" 200 18350
+[23/Jul/2026 02:32:27] "GET /backend/products/ HTTP/1.1" 200 18350
+[23/Jul/2026 02:32:59] "GET /backend/products/hatil-sofa/ HTTP/1.1" 200 13291
+[23/Jul/2026 02:32:59] "GET /static/website/js/event.js HTTP/1.1" 200 1133
+Bad Request: /backend/add-or-update-cart/
+[23/Jul/2026 02:33:07] "POST /backend/add-or-update-cart/ HTTP/1.1" 400 76
+[23/Jul/2026 02:33:07] "GET /backend/login/?next=%2Fbackend%2Fproducts%2Fhatil-sofa%2F HTTP/1.1" 200 3178

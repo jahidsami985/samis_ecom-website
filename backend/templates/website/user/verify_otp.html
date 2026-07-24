@@ -1,6 +1,23 @@
-<form method="post">
-    {% csrf_token %}
-    <p>OTP sent to {{ email }}</p>
-    <input type="text" name="otp" maxlength="6" required>
-    <button type="submit">Verify OTP</button>
-</form>
+{% extends 'web_base.html' %}
+
+{% block title %}Verify Account | samis e Commerce site{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="container-fluid">
+        <div class="auth-card">
+            <p class="store-eyebrow">Account verification</p>
+            <h1>Verify OTP</h1>
+            <p class="auth-copy">Enter the six-digit code sent to {{ email }}.</p>
+            <form method="post">
+                {% csrf_token %}
+                <label for="otp">OTP Code</label>
+                <input id="otp" type="text" name="otp" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" required autocomplete="one-time-code">
+
+                <button type="submit" class="store-btn store-btn-submit">Verify Account</button>
+            </form>
+            <p class="auth-link">Need a new code? <a href="{% url 'request_otp' %}">Request OTP</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}

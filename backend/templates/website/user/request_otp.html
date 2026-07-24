@@ -1,0 +1,23 @@
+{% extends 'web_base.html' %}
+
+{% block title %}Request OTP | samis e Commerce site{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="container-fluid">
+        <div class="auth-card">
+            <p class="store-eyebrow">Verification</p>
+            <h1>Request OTP</h1>
+            <p class="auth-copy">Enter your account email and we will send a fresh verification code.</p>
+            <form method="post">
+                {% csrf_token %}
+                <label for="email">Email</label>
+                <input id="email" type="email" name="email" required autocomplete="email">
+
+                <button type="submit" class="store-btn store-btn-submit">Send OTP</button>
+            </form>
+            <p class="auth-link">Ready to sign in? <a href="{% url 'user_login' %}">Login</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}

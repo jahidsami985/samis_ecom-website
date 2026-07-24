@@ -115,10 +115,39 @@ errorElements.forEach((element) => {
 });
 
 function search_box() {
-    document.getElementById('search-box').classList.add('active');
+    const searchBox = document.getElementById('search-box');
+    const searchInput = document.getElementById('search');
+    if (!searchBox || !searchInput) {
+        return;
+    }
+
+    if (!searchBox.classList.contains('active')) {
+        searchBox.classList.add('active');
+        searchInput.focus();
+        return;
+    }
+
+    const query = searchInput.value.trim();
+    if (query) {
+        window.location.href = `/backend/products/?q=${encodeURIComponent(query)}`;
+    }
 }
 $(document).click(function (event) {
     if (!$(event.target).closest('#search-box').length) {
         $('#search-box').removeClass('active');
     }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('search');
+    if (!searchInput) {
+        return;
+    }
+
+    searchInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            search_box();
+        }
+    });
 });

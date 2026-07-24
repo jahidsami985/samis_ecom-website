@@ -1,10 +1,13 @@
 from .models import EmailOTP
 
+import logging
 import random
 from django.template.loader import render_to_string
-from django.core.mail import send_mail, EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 def generate_otp(email):
 
@@ -54,4 +57,4 @@ def send_email(mail_to,cc_list,bcc_list,subject,template,context):
         try:
             email.send(fail_silently=False)
         except Exception as e:
-            print(f"Error sending email: {e}")
+            logger.warning("Error sending email: %s", e)

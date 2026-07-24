@@ -1,11 +1,7 @@
 {% extends 'web_base.html' %}
-{% block title %} Fico {% endblock %}
+{% block title %}{{ product.product_name }} | samis e Commerce site{% endblock %}
 
 {% load static %}
-
-{% block linkcss %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-{% endblock %}
 
 {% block content %}
 
@@ -14,7 +10,11 @@
         <div class="product-info-box">
             <div class="product-info-left product-info-body">
                 <div class="product-info-top">
-                    {% if product.product_image %}<img src="{{ product.product_image.url }}" alt="{{ product.product_name|default:'' }}" onerror="this.onerror=null;this.src='{% static 'website/images/products/product1.png' %}';">{% endif %}
+                    {% if product.product_image %}
+                        <img src="{{ product.product_image.url }}" alt="{{ product.product_name|default:'' }}" onerror="this.onerror=null;this.src='{% static 'website/images/products/product1.png' %}';">
+                    {% else %}
+                        <img src="{% static 'website/images/products/product1.png' %}" alt="{{ product.product_name|default:'' }}">
+                    {% endif %}
                 </div>
                 {% comment %} {% for related_image in product_related_images %}
                     {% if related_image.image %}
@@ -39,6 +39,10 @@
                         <div class="row-group bottom-br-color">
                             <h4 class="title">{{ product.product_name|default:'' }} </h4>
                         </div>
+                        <div class="row-group product-meta bottom-br-color">
+                            <p>{{ product.main_category.main_cat_name }}{% if product.sub_category %} / {{ product.sub_category.sub_cat_name }}{% endif %}</p>
+                            <p>{% if product.stock > 0 %}{{ product.stock }} in stock{% else %}Out of stock{% endif %}</p>
+                        </div>
                         <div class="row-group text-price bottom-br-color">
                             <div class="price-box">
                                 <p style="font-size: 18px;">BDT {{ product.discount_price|default:product.price }}</p>
@@ -53,35 +57,15 @@
                         </div>
                         {% endif %}
 
-                        {% if product.dimensions %}
-                        <div class="row-group bottom-br-color">
-                            <div class="info-subtitle"> DIMENSIONS <span class="plus">+</span> <span class="minus display_none">-</span> </div>
-                            <div class="expand-group product-dimensions display_none">
-                                {{ product.dimensions|safe }}
-                            </div>
-                        </div>
-                        {% endif %}
-                       
-                       
-                    
-                        
-                        <div class="row-group text-box">
-                            <div class="agree-box">
-                                <p>
-                                    <input type="radio" name="agree" id="agree" value="1">
-                                    <label for="agree">I agree to the Fico terms and conditions</label>
-                                </p>
-                            </div>
-                        </div> 
                         <div class="row-group">
                             <div class="add-cart-box">
                                     <div class="product-qty-box">
-                                        <button type="button" id="decrement" class="decrement"><span> - </span></button>
-                                        <input type="number" id="cart_qty" class="cart_qty cart_qty__{{ product.id }}" min="0" max="50" data-product-id="{{ product.id }}" value="{{ product.product_cart.quantity|default:'0' }}">
-                                        <button type="button" id="increment" class="increment"><span> + </span></button>
+                                        <button type="button" class="decrement" aria-label="Decrease quantity"><span> - </span></button>
+                                        <input type="number" class="cart_qty cart_qty__{{ product.id }}" min="0" max="50" data-product-id="{{ product.id }}" value="{{ product.product_cart.quantity|default:'0' }}">
+                                        <button type="button" class="increment" aria-label="Increase quantity"><span> + </span></button>
                                     </div>
                                 <div class="product-addtocart-box">
-                                    <button type="submit" id="add_to_cart" class="add_to_cart fico-button button_white" data-product-id="{{ product.id }}">Add to Cart</button>
+                                    <button type="submit" id="add_to_cart" class="add_to_cart fico-button button_white" data-product-id="{{ product.id }}">{% if product.product_cart %}Remove from Cart{% else %}Add to Cart{% endif %}</button>
                         
                                 </div>
                             </div>
@@ -101,15 +85,6 @@
 </section>
 
 
-
-
-
-{% endblock %}
-
-{% block linkScript %}
-<!-- Swiper For Home JS -->
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script src="{% static 'website/js/event.js' %}"></script>
 
 
 

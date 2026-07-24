@@ -3,6 +3,8 @@ try:
 except ImportError:
     requests = None
 
+import logging
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
@@ -14,9 +16,13 @@ from django.utils import timezone
 from django.db.models import Sum
 
 from django.core import signing
+from django.core.signing import BadSignature
 from django.shortcuts import redirect
 
 from django.contrib import messages
+
+
+logger = logging.getLogger(__name__)
 
 
 def payment_dependency_error():
@@ -78,6 +84,8 @@ def create_payment_request(request, order_id):
 
     transaction_id = str(uuid4())
     order_obj = Order.objects.filter(id=order_id).last()
+    if not order_obj:
+        return {'status': 'FAILED', 'error_message': 'Order not found.'}, 404
 
     success_url = request.build_absolute_uri(f'/backend/payment/success/{transaction_id}/')
     fail_url = request.build_absolute_uri(f'/backend/payment/failed/{transaction_id}/')
@@ -110,8 +118,16 @@ def create_payment_request(request, order_id):
         'product_category': 'Ecommerce',
         'product_profile': 'general',
     }
-    response = requests.post(settings.SSLCOMMERZ_API_URL, data=payment_data)
-    data = response.json()
+    try:
+        response = requests.post(settings.SSLCOMMERZ_API_URL, data=payment_data, timeout=20)
+        response.raise_for_status()
+        data = response.json()
+    except Exception as exc:
+        logger.warning("SSLCommerz payment request failed: %s", exc)
+        return {
+            'status': 'FAILED',
+            'error_message': 'Payment gateway request failed. Please try again later.',
+        }, 502
 
     if data.get('status') == 'SUCCESS':
         response_data = {
@@ -132,6 +148,9 @@ def create_payment_request(request, order_id):
 def payment_complete(request, str_data):
     
     val_id = request.POST.get('val_id')
+    if not val_id:
+        messages.error(request, "Payment verification data is missing.")
+        return redirect('home')
 
     try:
         payment_object = OnlinePaymentRequest.objects.get(transaction_id=str_data)
@@ -172,9 +191,13 @@ def verify_ssl_payment(val_id):
         'format': 'json'
     }
 
-    response = requests.get(settings.SSLCOMMERZ_VALIDATION_API, params=payload)
-    print(f"SSL Verification Response: {response.text}")
-    result = response.json()
+    try:
+        response = requests.get(settings.SSLCOMMERZ_VALIDATION_API, params=payload, timeout=20)
+        response.raise_for_status()
+        result = response.json()
+    except Exception as exc:
+        logger.warning("SSLCommerz verification failed: %s", exc)
+        return False
     
     if result.get('status') == 'VALID':
         return True
@@ -204,7 +227,10 @@ def update_payment_in_order(transaction_id):
 
 @csrf_exempt
 def payment_cancel(request, str_data):
-    payment_object = OnlinePaymentRequest.objects.get(transaction_id=str_data)
+    payment_object = OnlinePaymentRequest.objects.filter(transaction_id=str_data).first()
+    if not payment_object:
+        messages.error(request, "Invalid transaction")
+        return redirect('home')
 
     if payment_object.payment_status != "Paid":
         payment_object.payment_status = "Cancelled"
@@ -215,7 +241,10 @@ def payment_cancel(request, str_data):
 
 @csrf_exempt
 def payment_failed(request, str_data):
-    payment_object = OnlinePaymentRequest.objects.get(transaction_id=str_data)
+    payment_object = OnlinePaymentRequest.objects.filter(transaction_id=str_data).first()
+    if not payment_object:
+        messages.error(request, "Invalid transaction")
+        return redirect('home')
 
     if payment_object.payment_status != "Paid":
         payment_object.payment_status = "Failed"
@@ -225,9 +254,14 @@ def payment_failed(request, str_data):
 
 @csrf_exempt
 def payment_check(request, str_data):
-    pk = signing.loads(str_data)
+    try:
+        pk = signing.loads(str_data)
+    except BadSignature:
+        return JsonResponse({'status': False}, status=400)
 
-    payment_object = OnlinePaymentRequest.objects.get(id=pk)
+    payment_object = OnlinePaymentRequest.objects.filter(id=pk).first()
+    if not payment_object:
+        return JsonResponse({'status': False}, status=404)
     if payment_object.transaction_id:
         status = verify_ssl_payment(payment_object.transaction_id)
 

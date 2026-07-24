@@ -1,22 +1,19 @@
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-
 from backend.utls import generate_otp
 from .models import MenuList, Order, OrderDetail, ProductMainCategory, ProductSubCategory
 from django.contrib.auth.models import User
-from .views_payment import create_payment_request
+from .views_payment import create_payment_request, payment_dependency_error
 
 
 
-from django.shortcuts import redirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db import transaction
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
+from django.utils.http import url_has_allowed_host_and_scheme
 
 
 from backend.models import  Customer, Product,EmailOTP,OrderCart
@@ -286,8 +283,8 @@ def home(request):
 
 def login_view(request):
     if request.method == 'POST':
-        phone = request.POST['phone']
-        password = request.POST['password']
+        phone = request.POST.get('phone', '').strip()
+        password = request.POST.get('password', '')
 
         profile = Customer.objects.filter(phone=phone, is_active=True).select_related('user').first()
         if not profile:
@@ -302,12 +299,10 @@ def login_view(request):
             messages.error(request, "Invalid phone number or password.")
             return render(request, 'website/user/login.html')
 
-        next_url = request.GET.get('next')
-        if next_url:
-            next_url = next_url.strip()
-        else:
-            next_url = "home"
-        return redirect(next_url)
+        next_url = request.GET.get('next', '').strip()
+        if url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+            return redirect(next_url)
+        return redirect('home')
             
         
 
@@ -315,14 +310,25 @@ def login_view(request):
 
 def register(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        email = request.POST['email']
-        phone = request.POST['phone']
-        dob = request.POST['date_of_birth']
-        password = request.POST['password']
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip().lower()
+        phone = request.POST.get('phone', '').strip()
+        dob = request.POST.get('date_of_birth')
+        password = request.POST.get('password', '')
+
+        if not all([username, email, phone, dob, password]):
+            messages.error(request, 'Please complete all registration fields.')
+            return render(request, 'website/user/register.html')
 
         if User.objects.filter(username=username).exists():
-            return render(request, 'website/user/register.html', {'error': 'Username already taken'})
+            messages.error(request, 'Username already taken.')
+            return render(request, 'website/user/register.html')
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'An account with this email already exists.')
+            return render(request, 'website/user/register.html')
+        if Customer.objects.filter(phone=phone).exists():
+            messages.error(request, 'An account with this phone number already exists.')
+            return render(request, 'website/user/register.html')
         
         user = User.objects.create_user(username=username, email=email, password=password)
         Customer.objects.create(user=user, phone=phone, date_of_birth=dob, is_active=False)
@@ -382,89 +388,109 @@ def products_details(request, product_slug):
     return render(request, 'website/product/products_details.html', context)
 
 def add_or_update_cart(request):
-
-    
     is_authenticated = request.user.is_authenticated
-    
-    
-    if is_authenticated:
-        if request.method == 'POST':
-            
-            customer=Customer.objects.filter(user=request.user, is_active=True).first()
-            if not customer:
-                return JsonResponse({
-                    'status': 'error',
-                    'message': 'Please log in with an active customer account before adding items to cart.',
-                    'is_authenticated': is_authenticated,
-                }, status=403)
-            
-            product_id = request.POST.get('product_id')
-            product = Product.objects.filter(id=product_id, is_active=True).first()
-            if not product:
-                return JsonResponse({
-                    'status': 'error',
-                    'message': 'Product not found.',
-                    'is_authenticated': is_authenticated,
-                }, status=404)
 
-            try:
-                quantity = int(request.POST.get('quantity', 0))
-            except (TypeError, ValueError):
-                return JsonResponse({
-                    'status': 'error',
-                    'message': 'Invalid quantity.',
-                    'is_authenticated': is_authenticated,
-                }, status=400)
+    if request.method != 'POST':
+        return JsonResponse({
+            'status': 'error',
+            'message': 'POST is required to update the cart.',
+            'is_authenticated': is_authenticated,
+        }, status=405)
 
-            try:
-                isRemoved = False
+    if not is_authenticated:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Please log in before adding items to cart.',
+            'is_authenticated': False,
+        }, status=401)
 
-                cart_item, created = OrderCart.objects.update_or_create(
-                    customer=customer, product=product, is_order=False, is_active=True,
-                    defaults={'quantity': quantity}
-                )
-                
-                if not created:
-                    if quantity <= 0:
-                        cart_item.is_active = False
-                        isRemoved = True
+    customer = Customer.objects.filter(user=request.user, is_active=True).first()
+    if not customer:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Please log in with an active customer account before adding items to cart.',
+            'is_authenticated': True,
+        }, status=403)
 
-                    cart_item.quantity = quantity
-                    cart_item.save()
+    product_id = request.POST.get('product_id')
+    product = Product.objects.filter(id=product_id, is_active=True).first()
+    if not product:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Product not found.',
+            'is_authenticated': True,
+        }, status=404)
 
-                amount_summary = cart_amount_summary(request)
+    try:
+        quantity = int(request.POST.get('quantity', 0))
+    except (TypeError, ValueError):
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Invalid quantity.',
+            'is_authenticated': True,
+        }, status=400)
 
-                cart_item_count = OrderCart.objects.filter(customer=customer, is_order=False, is_active=True).count()
-                print(f"Cart Item Count: {cart_item_count}")
+    quantity = max(0, min(quantity, 50))
+    is_removed = quantity == 0
+    item_price = 0
 
-               
+    if is_removed:
+        cart_item = OrderCart.objects.filter(
+            customer=customer,
+            product=product,
+            is_order=False,
+            is_active=True,
+        ).first()
+        if cart_item:
+            cart_item.quantity = 0
+            cart_item.is_active = False
+            cart_item.save(update_fields=['quantity', 'is_active', 'updated_at'])
+    else:
+        cart_item, _ = OrderCart.objects.update_or_create(
+            customer=customer,
+            product=product,
+            is_order=False,
+            is_active=True,
+            defaults={'quantity': quantity},
+        )
+        item_price = cart_item.total_amount
 
-                response = {
-                    'status': 'success',
-                    'message': 'Cart updated successfully',
-                    'is_authenticated': is_authenticated,
-                    'isRemoved': isRemoved,
-                    'item_price': cart_item.total_amount,
-                    'cart_item_count': cart_item_count,
-                    'amount_summary': amount_summary,
-                }
-                
-                return JsonResponse(response)
-            
+    amount_summary = cart_amount_summary(request)
+    cart_item_count = OrderCart.objects.filter(customer=customer, is_order=False, is_active=True).count()
 
-            except OrderCart.DoesNotExist:
-                return JsonResponse({'status': 'error', 'message': 'Cart item not found', 'is_authenticated': is_authenticated,})
-
-    return JsonResponse({'status': 'error', 'message': 'Invalid request', 'is_authenticated': is_authenticated,}, status=400)
+    return JsonResponse({
+        'status': 'success',
+        'message': 'Cart updated successfully',
+        'is_authenticated': True,
+        'isRemoved': is_removed,
+        'item_price': item_price,
+        'cart_item_count': cart_item_count,
+        'quantity': quantity,
+        'amount_summary': amount_summary,
+    })
 
 def product_web_list(request):
+    search_query = request.GET.get('q', '').strip()
     products = Product.objects.filter(is_active=True).select_related('main_category', 'sub_category').order_by('-id')
-    main_categories = ProductMainCategory.objects.filter(is_active=True).prefetch_related(
+    if search_query:
+        products = products.filter(
+            Q(product_name__icontains=search_query)
+            | Q(description__icontains=search_query)
+            | Q(main_category__main_cat_name__icontains=search_query)
+            | Q(sub_category__sub_cat_name__icontains=search_query)
+        ).distinct()
+
+    category_queryset = ProductMainCategory.objects.filter(is_active=True)
+    if search_query:
+        category_queryset = category_queryset.filter(products__in=products).distinct()
+
+    main_categories = category_queryset.prefetch_related(
         Prefetch('products', queryset=products, to_attr='active_products')
     ).order_by('cat_ordering', 'main_cat_name')
     context = {
         'products': products,
         'main_categories': main_categories,
+        'search_query': search_query,
     }
     return render(request, 'website/product/list.html', context)
 
@@ -484,18 +510,26 @@ def cart(request):
 
 def request_otp_view(request):
     if request.method == 'POST':
-        email = request.POST.get('email')
+        email = request.POST.get('email', '').strip().lower()
+        if not email:
+            messages.error(request, "Email is required.")
+            return render(request, 'website/user/request_otp.html')
         generate_otp(email)
         return redirect(f'/backend/verify-otp/?email={email}')
-    
+
+    return render(request, 'website/user/request_otp.html')
 
 
 def verify_otp_view(request):
-    email = request.GET.get('email')
+    email = request.GET.get('email', '').strip().lower()
+
+    if not email:
+        messages.error(request, "Enter your email to request a verification code.")
+        return redirect('request_otp')
 
     if request.method == 'POST':
         otp = request.POST.get('otp')
-        otp_obj = EmailOTP.objects.filter(email=email, code=otp).order_by('-created_at').first()
+        otp_obj = EmailOTP.objects.filter(email=email, code=otp, is_active=True).order_by('-created_at').first()
 
        
 
@@ -508,6 +542,8 @@ def verify_otp_view(request):
             if customer:
                 customer.is_active = True
                 customer.save()
+                otp_obj.is_active = False
+                otp_obj.save(update_fields=['is_active'])
                 messages.success(request, "OTP verified successfully. You can now log in.")
             else:
                 messages.error(request, "Customer not found. Please contact support.")
@@ -519,130 +555,38 @@ def verify_otp_view(request):
     return render(request, 'website/user/verify_otp.html', {'email': email})      
            
        
-
-  
-
-def add_or_update_cart(request):
-
-    
-    is_authenticated = request.user.is_authenticated
-    
-    
-    if is_authenticated:
-        if request.method == 'POST':
-            
-            customer=Customer.objects.filter(user=request.user, is_active=True).first()
-            if not customer:
-                return JsonResponse({
-                    'status': 'error',
-                    'message': 'Please log in with an active customer account before adding items to cart.',
-                    'is_authenticated': is_authenticated,
-                }, status=403)
-            
-            product_id = request.POST.get('product_id')
-            product = Product.objects.filter(id=product_id, is_active=True).first()
-            if not product:
-                return JsonResponse({
-                    'status': 'error',
-                    'message': 'Product not found.',
-                    'is_authenticated': is_authenticated,
-                }, status=404)
-
-            try:
-                quantity = int(request.POST.get('quantity', 0))
-            except (TypeError, ValueError):
-                return JsonResponse({
-                    'status': 'error',
-                    'message': 'Invalid quantity.',
-                    'is_authenticated': is_authenticated,
-                }, status=400)
-
-            try:
-                isRemoved = False
-
-                cart_item, created = OrderCart.objects.update_or_create(
-                    customer=customer, product=product, is_order=False, is_active=True,
-                    defaults={'quantity': quantity}
-                )
-                
-                if not created:
-                    if quantity <= 0:
-                        cart_item.is_active = False
-                        isRemoved = True
-
-                    cart_item.quantity = quantity
-                    cart_item.save()
-
-                amount_summary = cart_amount_summary(request)
-
-                cart_item_count = OrderCart.objects.filter(customer=customer, is_order=False, is_active=True).count()
-                print(f"Cart Item Count: {cart_item_count}")
-
-               
-
-                response = {
-                    'status': 'success',
-                    'message': 'Cart updated successfully',
-                    'is_authenticated': is_authenticated,
-                    'isRemoved': isRemoved,
-                    'item_price': cart_item.total_amount,
-                    'cart_item_count': cart_item_count,
-                    'amount_summary': amount_summary,
-                }
-                
-                return JsonResponse(response)
-            
-
-            except OrderCart.DoesNotExist:
-                return JsonResponse({'status': 'error', 'message': 'Cart item not found', 'is_authenticated': is_authenticated,})
-
-    return JsonResponse({'status': 'error', 'message': 'Invalid request', 'is_authenticated': is_authenticated,}, status=400)
-
-
-def cart_amount_summary(request):
-
-    sub_total_amount = 0
-    total_vat = 0
-    total_discount = 0
-    grand_total = 0
-
-    if request.user.is_authenticated:
-        customer= Customer.objects.filter(user=request.user).first()
-        cart_items = OrderCart.objects.filter(customer=customer, is_active=True, is_order=False)
-        for item in cart_items:
-            sub_total_amount += item.total_amount
-            #total_vat += (item.product.price * 0.15)
-    grand_total = (sub_total_amount + total_vat) - total_discount 
-
-    return {'sub_total_amount': sub_total_amount, 'total_vat': total_vat, 'total_discount': total_discount, 'grand_total': grand_total}
-           
 @login_required
 def checkout(request):
+    customer = Customer.objects.filter(user=request.user, is_active=True).first()
+    if not customer:
+        messages.error(request, "Please log in with an active customer account before checkout.")
+        return redirect('user_login')
 
+    cart_items = OrderCart.objects.filter(customer=customer, is_active=True, is_order=False).select_related('product')
     amount_summary= cart_amount_summary(request)
     grand_total = amount_summary.get('grand_total', 0)
 
-    if grand_total < 1:
+    if grand_total < 1 or not cart_items.exists():
         messages.error(request, "Your cart is empty. Please add items to cart before checkout.")
         return redirect('cart')
-    
+
+    if request.method != 'POST':
+        return redirect('cart')
+
+    gateway_error = payment_dependency_error()
+    if gateway_error:
+        messages.error(request, gateway_error)
+        return redirect('cart')
+
     if request.method == 'POST':
         with transaction.atomic():
-            billing_address = request.POST.get('billing_address')
-
-            print(f"Billing Address: {billing_address}")
-            print("testtststs")
-            customer= Customer.objects.filter(user=request.user).first()
+            billing_address = request.POST.get('billing_address', '').strip()
 
             if not billing_address:
                 messages.error(request, "Billing address is required.")
+                return redirect('cart')
 
-                print("Checkout failed: Missing billing address.")
-                return redirect('checkout')
-            
-            cart_items = OrderCart.objects.filter(customer=customer, is_active=True, is_order=False)
-
-            if len(cart_items) == 0:
+            if not cart_items.exists():
                 messages.error(request, "Your cart is empty. Please add items to cart before checkout.")
                 return redirect('cart')
             else:
@@ -677,26 +621,22 @@ def checkout(request):
                 order_obj.grand_total = grand_total
                 order_obj.save()
 
-                messages.success(request, "Your order has been placed successfully.")
-
-                #print(f"Order Amount: {order_amount}, Shipping Charge: {shipping_charge}, Discount: {discount}, Coupon Discount: {coupon_discount}, VAT Amount: {vat_amount}, Tax Amount: {tax_amount}, Grand Total: {grand_total}")
                 response_data, response_status = create_payment_request(request, order_obj.id)
-                print(response_data)
-                print(response_status)
 
                 if response_data['status'] == "SUCCESS":
                         for cart_item in cart_items:
                             cart_item.is_order = True
                             cart_item.save()
 
+                        messages.success(request, "Your order has been placed successfully.")
                         return redirect(response_data['GatewayPageURL'])
                 elif "error_message" in response_data:
                         messages.error(request, response_data['error_message'])
                 else:
                         messages.error(request, 'Failed to payment.')
 
-
-                return redirect('home')
+                transaction.set_rollback(True)
+                return redirect('cart')
 
 
                     

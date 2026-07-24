@@ -10,7 +10,7 @@
         {% block metatag %}{% endblock %}
         <!-- Bootstrap CSS -->
         <link href="{% static 'website/css/bootstrap.min.css' %}" rel="stylesheet" crossorigin="anonymous">
-        <link rel="stylesheet" href="{% static '/website/css/all.min.css' %}" referrerpolicy="no-referrer" />
+        <link rel="stylesheet" href="{% static 'website/css/all.min.css' %}" referrerpolicy="no-referrer" />
         
         <link href="{% static 'website/css/style.css' %}" rel="stylesheet" crossorigin="anonymous">
         <link href="{% static 'website/css/media-query.css' %}" rel="stylesheet" crossorigin="anonymous">
@@ -63,25 +63,25 @@
                         <ul>
                             <li>
                                 <div class="search-box" id="search-box">
-                                    <input type="search" name="search" id="search" placeholder="Search products">
-                                    <button type="button" onclick="search_box()" id="search-btn"><img src="{% static 'website/images/icons/search.svg' %}" alt="Search"></button>
+                                    <input type="search" name="search" id="search" placeholder="Search products" value="{{ request.GET.q|default:'' }}">
+                                    <button type="button" onclick="search_box()" id="search-btn" aria-label="Search products"><img src="{% static 'website/images/icons/search.svg' %}" alt=""></button>
                                 </div>
                             </li>
                             <li class="cart-box">
-                                <button type="button" class="cart-qty-box" onclick="cart_open()"> <img src="{% static 'website/images/icons/shopping-cart.svg' %}" alt="cart">
-                                    <span class="item-qty" id="cart_item_quantity" {% if cart_item_count < 1 %}style="display: none;"{% endif %}>{{ cart_item_count|default:0 }}</span>
-                                    <span class="item-qty cart_item_quantity">{{ cart_item_count|default:0 }}</span>
+                                <button type="button" class="cart-qty-box" onclick="cart_open()" aria-label="Open cart">
+                                    <img src="{% static 'website/images/icons/shopping-cart.svg' %}" alt="">
+                                    <span class="item-qty cart_item_quantity" {% if cart_item_count < 1 %}style="display: none;"{% endif %}>{{ cart_item_count|default:0 }}</span>
                                 </button>
                             </li>
                             <li class="profile-nav">
                                 {% if user.is_authenticated %}
-                                    <a href="#"><img src="{% static 'website/images/icons/user-icon.svg' %}" alt="user"></a>
+                                    <a href="{% url 'cart' %}" aria-label="Account"><img src="{% static 'website/images/icons/user-icon.svg' %}" alt=""></a>
                                     <ul>
-                                        <li><a href="">My Account</a></li>
+                                        <li><a href="{% url 'cart' %}">My Cart</a></li>
                                         <li><a href="{% url 'user_logout' %}">Logout</a></li>
                                     </ul>
                                 {% else %}
-                                    <a href="{% url 'user_login' %}"><img src="{% static 'website/images/icons/user-icon.svg' %}" alt="user"></a>
+                                    <a href="{% url 'user_login' %}" aria-label="Login"><img src="{% static 'website/images/icons/user-icon.svg' %}" alt=""></a>
                                 {% endif %}
                             </li>
                            
@@ -108,16 +108,19 @@
                                                 </div>
                                                 <div class="pocket-text">
                                                     <p>{{ cart.product.product_name }}</p>
-                                                    {% comment %} <p><span class="opacity">True Vintage</span></p> {% endcomment %}
                                                     <div class="pocket-product-qty">
-                                                        <button type="button" id="decrement" class="decrement"><img src="{% static 'website/images/icons/minus.svg' %}" alt="-"></button>
-                                                        <input type="number" id="cart_qty" class="cart_qty cart_qty__{{ cart.product.id }}" min="0" max="50" data-product-id="{{ cart.product.id }}" value="{{ cart.quantity }}">
-                                                        <button type="button" id="increment" class="increment"><img src="{% static 'website/images/icons/plus.svg' %}" alt="+"></button>
+                                                        <button type="button" class="decrement" aria-label="Decrease {{ cart.product.product_name }} quantity"><img src="{% static 'website/images/icons/minus.svg' %}" alt=""></button>
+                                                        <input type="number" class="cart_qty cart_qty__{{ cart.product.id }}" min="0" max="50" data-product-id="{{ cart.product.id }}" value="{{ cart.quantity }}">
+                                                        <button type="button" class="increment" aria-label="Increase {{ cart.product.product_name }} quantity"><img src="{% static 'website/images/icons/plus.svg' %}" alt=""></button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
                                        <td width="100" class="text-center"><span class="total_price__{{ cart.product.id }}">{{cart.total_amount|default:0|floatformat:2}}</span></td>
+                                    </tr>
+                                {% empty %}
+                                    <tr class="cart-pocket-empty">
+                                        <td colspan="2">Your cart is empty.</td>
                                     </tr>
                                 {% endfor %}
                             </table>
@@ -168,8 +171,8 @@
                                                     
                                                     <li><a href="{% url 'home' %}#about-site">About</a></li>
                                                     <li><a href="{% url 'product_web_list' %}">Products</a></li>
-                                                    <li><a href="#">Privacy Policy</a></li>
-                                                    <li><a href="#">Terms & Conditions</a></li>
+                                                    <li><a href="{% url 'request_otp' %}">Verify Account</a></li>
+                                                    <li><a href="{% url 'cart' %}">Cart</a></li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -188,7 +191,6 @@
         <script src="{% static 'website/js/bootstrap.bundle.min.js' %}"></script>
         <!-- jQuery -->
         <script src="{% static 'website/js/jquery-3.6.4.min.js' %}" crossorigin="anonymous"></script>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <!-- Custom Dropdown JS -->
         <script src="{% static 'website/js/custom_dropdown.js' %}"></script>
         

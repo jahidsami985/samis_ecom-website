@@ -1,0 +1,117 @@
+Traceback (most recent call last):
+  File "D:\projects\ecom\venv\Lib\site-packages\pymysql\connections.py", line 682, in connect
+    sock = socket.create_connection(
+        (self.host, self.port), self.connect_timeout, **kwargs
+    )
+  File "C:\Program Files\Python313\Lib\socket.py", line 840, in create_connection
+    for res in getaddrinfo(host, port, 0, SOCK_STREAM):
+               ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\socket.py", line 977, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\projects\ecom\venv\Lib\site-packages\django\db\backends\base\base.py", line 275, in ensure_connection
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "D:\projects\ecom\venv\Lib\site-packages\django\db\backends\base\base.py", line 256, in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "D:\projects\ecom\venv\Lib\site-packages\django\db\backends\mysql\base.py", line 255, in get_new_connection
+    connection = Database.connect(**conn_params)
+  File "D:\projects\ecom\venv\Lib\site-packages\pymysql\connections.py", line 372, in __init__
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "D:\projects\ecom\venv\Lib\site-packages\pymysql\connections.py", line 744, in connect
+    raise exc
+pymysql.err.OperationalError: (2003, "Can't connect to MySQL server on 'mysql-114733ce-jahiduddinsami13-0d95.i.aivencloud.com' ([Errno 11001] getaddrinfo failed)")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\projects\ecom\ecom\manage.py", line 22, in <module>
+    main()
+    ~~~~^^
+  File "D:\projects\ecom\ecom\manage.py", line 18, in main
+    execute_from_command_line(sys.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\core\management\__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+    ~~~~~~~~~~~~~~~^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\core\management\__init__.py", line 436, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\core\management\base.py", line 412, in run_from_argv
+    self.execute(*args, **cmd_options)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\core\management\commands\runserver.py", line 74, in execute
+    super().execute(*args, **options)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\core\management\base.py", line 458, in execute
+    output = self.handle(*args, **options)
+  File "D:\projects\ecom\venv\Lib\site-packages\django\core\management\commands\runserver.py", line 111, in handle
+    self.run(**options)
+    ~~~~~~~~^^^^^^^^^^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\core\management\commands\runserver.py", line 120, in run
+    self.inner_run(None, **options)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\core\management\commands\runserver.py", line 136, in inner_run
+    self.check_migrations()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\core\management\base.py", line 574, in check_migrations
+    executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
+  File "D:\projects\ecom\venv\Lib\site-packages\django\db\migrations\executor.py", line 18, in __init__
+    self.loader = MigrationLoader(self.connection)
+                  ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\db\migrations\loader.py", line 58, in __init__
+    self.build_graph()
+    ~~~~~~~~~~~~~~~~^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\db\migrations\loader.py", line 235, in build_graph
+    self.applied_migrations = recorder.applied_migrations()
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\db\migrations\recorder.py", line 89, in applied_migrations
+    if self.has_table():
+       ~~~~~~~~~~~~~~^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\db\migrations\recorder.py", line 63, in has_table
+    with self.connection.cursor() as cursor:
+         ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "D:\projects\ecom\venv\Lib\site-packages\django\db\backends\base\base.py", line 316, in cursor
+    return self._cursor()
+           ~~~~~~~~~~~~^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\db\backends\base\base.py", line 292, in _cursor
+    self.ensure_connection()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "D:\projects\ecom\venv\Lib\site-packages\django\db\backends\base\base.py", line 274, in ensure_connection
+    with self.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "D:\projects\ecom\venv\Lib\site-packages\django\db\backends\base\base.py", line 275, in ensure_connection
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "D:\projects\ecom\venv\Lib\site-packages\django\db\backends\base\base.py", line 256, in connect
+    self.connection = self.get_new_connection(conn_params)
+                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\projects\ecom\venv\Lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "D:\projects\ecom\venv\Lib\site-packages\django\db\backends\mysql\base.py", line 255, in get_new_connection
+    connection = Database.connect(**conn_params)
+  File "D:\projects\ecom\venv\Lib\site-packages\pymysql\connections.py", line 372, in __init__
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "D:\projects\ecom\venv\Lib\site-packages\pymysql\connections.py", line 744, in connect
+    raise exc
+django.db.utils.OperationalError: (2003, "Can't connect to MySQL server on 'mysql-114733ce-jahiduddinsami13-0d95.i.aivencloud.com' ([Errno 11001] getaddrinfo failed)")

@@ -9,19 +9,27 @@
     <div class="container-fluid">
         <div class="catalog-hero-content">
             <p class="store-eyebrow">Category-first shopping</p>
-            <h1>Products</h1>
-            <p>Every product is shown inside its category, so Furniture, Phones, and T-Shirts stay easy to browse.</p>
+            <h1>{% if search_query %}Search Results{% else %}Products{% endif %}</h1>
+            <p>
+                {% if search_query %}
+                    Results for "{{ search_query }}" across product names, descriptions, and categories.
+                {% else %}
+                    Every product is shown inside its category, so Furniture, Phones, and T-Shirts stay easy to browse.
+                {% endif %}
+            </p>
         </div>
     </div>
 </section>
 
 <section class="catalog-wrap" id="categories">
     <div class="container-fluid">
-        <div class="catalog-tabs">
-            {% for category in main_categories %}
-                <a href="#category-{{ category.cat_slug }}">{{ category.main_cat_name }}</a>
-            {% endfor %}
-        </div>
+        {% if main_categories %}
+            <div class="catalog-tabs">
+                {% for category in main_categories %}
+                    <a href="#category-{{ category.cat_slug }}">{{ category.main_cat_name }}</a>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         {% for category in main_categories %}
             <section class="catalog-category-section" id="category-{{ category.cat_slug }}">
@@ -55,7 +63,13 @@
                 </div>
             </section>
         {% empty %}
-            <div class="store-empty-card">Categories will appear here after products are added.</div>
+            <div class="store-empty-card">
+                {% if search_query %}
+                    No products matched "{{ search_query }}".
+                {% else %}
+                    Categories will appear here after products are added.
+                {% endif %}
+            </div>
         {% endfor %}
     </div>
 </section>

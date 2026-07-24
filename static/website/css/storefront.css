@@ -574,6 +574,213 @@ html {
     font-family: 'Karla-SemiBold';
 }
 
+.auth-section {
+    background: linear-gradient(135deg, #f7f6f1 0%, #eef3ea 58%, #f4eddc 100%);
+    padding: 72px 0;
+}
+
+.auth-card {
+    background: var(--site-panel);
+    border: 1px solid var(--site-border);
+    border-radius: 8px;
+    box-shadow: var(--site-shadow);
+    margin: 0 auto;
+    max-width: 460px;
+    padding: 32px;
+}
+
+.auth-card h1 {
+    color: var(--site-ink);
+    font-family: 'Spectral-SemiBold';
+    font-size: 34px;
+    line-height: 1.15;
+    margin-bottom: 22px;
+}
+
+.auth-copy,
+.auth-link {
+    color: var(--site-muted);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.auth-copy {
+    margin-bottom: 20px;
+}
+
+.auth-card label {
+    color: var(--site-ink);
+    display: block;
+    font-family: 'Karla-SemiBold';
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+.auth-card input {
+    background: #fbfcfa;
+    border: 1px solid var(--site-border);
+    border-radius: 8px;
+    color: var(--site-ink);
+    height: 44px;
+    margin-bottom: 16px;
+    padding: 0 12px;
+    width: 100%;
+}
+
+.auth-card input:focus,
+.billing-info .form-control:focus,
+.cart_qty:focus {
+    border-color: var(--site-accent);
+    box-shadow: 0 0 0 3px rgba(40, 112, 93, .12);
+    outline: none;
+}
+
+.store-btn-submit,
+.cart-empty-state .store-btn-dark {
+    background: var(--site-accent);
+    border: 1px solid var(--site-accent);
+    color: #ffffff;
+    width: 100%;
+}
+
+.store-btn-submit:hover,
+.cart-empty-state .store-btn-dark:hover {
+    background: var(--site-accent-dark);
+    color: #ffffff;
+}
+
+.auth-link {
+    margin-top: 18px;
+    text-align: center;
+}
+
+.auth-link a {
+    color: var(--site-accent-dark);
+    font-family: 'Karla-SemiBold';
+    text-decoration: none;
+}
+
+.auth-link a:hover {
+    text-decoration: underline;
+}
+
+.messages {
+    background: transparent;
+    display: grid;
+    gap: 8px;
+    left: 50%;
+    list-style: none;
+    margin: 0;
+    max-width: min(520px, calc(100vw - 32px));
+    padding: 0;
+    position: fixed;
+    top: 92px;
+    transform: translateX(-50%);
+    width: 100%;
+    z-index: 1200;
+}
+
+.messages li {
+    background: #ffffff;
+    border: 1px solid var(--site-border);
+    border-left: 4px solid var(--site-accent);
+    border-radius: 8px;
+    box-shadow: var(--site-shadow);
+    color: var(--site-ink);
+    line-height: 1.45;
+    padding: 12px 14px;
+}
+
+.messages li.error {
+    border-left-color: #b94a35;
+}
+
+.product-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+
+.product-meta p {
+    color: var(--site-muted);
+    font-size: 14px;
+}
+
+.product-info-top img {
+    background: #ffffff;
+    border: 1px solid var(--site-border);
+    border-radius: 8px;
+    display: block;
+    max-height: 620px;
+    object-fit: contain;
+    width: 100%;
+}
+
+.cart-empty-state {
+    margin: 0 auto;
+    max-width: 520px;
+    text-align: center;
+}
+
+.cart-empty-state h2 {
+    color: var(--site-ink);
+    font-family: 'Spectral-SemiBold';
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.cart-empty-state p {
+    margin-bottom: 20px;
+}
+
+.cart-empty-state .store-btn {
+    max-width: 180px;
+}
+
+.cart-pocket-empty td {
+    color: var(--site-muted);
+    padding: 16px !important;
+    text-align: center;
+}
+
+.cart-info-box {
+    gap: 16px;
+}
+
+.cart-product-image {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid var(--site-border);
+    border-radius: 8px;
+    display: flex;
+    flex: 0 0 96px;
+    height: 96px;
+    justify-content: center;
+    overflow: hidden;
+    width: 96px;
+}
+
+.cart-product-image img {
+    height: 100%;
+    object-fit: contain;
+    width: 100%;
+}
+
+.billing-info .form-control {
+    background: #fbfcfa;
+    border-color: var(--site-border);
+    border-radius: 8px;
+    min-height: 42px;
+}
+
+.action-box button {
+    border-radius: 6px;
+}
+
+.cart-list .table-box {
+    width: 100%;
+}
+
 .site-body .footer {
     background: #ffffff;
     border-top: 1px solid var(--site-border);
