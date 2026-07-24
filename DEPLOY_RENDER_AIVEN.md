@@ -47,22 +47,14 @@ MYSQL_USER=avnadmin
 MYSQL_PASSWORD=<from Aiven>
 MYSQL_HOST=<from Aiven>
 MYSQL_PORT=<from Aiven>
-MYSQL_SSL_CA_CONTENT=<full Aiven CA certificate>
+MYSQL_SSL_MODE=REQUIRED
 DJANGO_ALLOWED_HOSTS=<your-render-service>.onrender.com
 CSRF_TRUSTED_ORIGINS=https://<your-render-service>.onrender.com
 ```
 
 Render can generate `SECRET_KEY` from `render.yaml`. If you create the service manually, add a long random `SECRET_KEY`.
 
-For `MYSQL_SSL_CA_CONTENT`, paste the complete Aiven certificate, including:
-
-```text
------BEGIN CERTIFICATE-----
-...
------END CERTIFICATE-----
-```
-
-If Render does not preserve line breaks, replace each line break with `\n`.
+The Aiven dashboard service URI uses `ssl-mode=REQUIRED`; the matching Render environment variable is `MYSQL_SSL_MODE=REQUIRED`.
 
 Add these only if you use OTP email or payment:
 

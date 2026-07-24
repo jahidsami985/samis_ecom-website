@@ -150,8 +150,12 @@ else:
     mysql_options = {
         "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
     }
+    mysql_ssl_mode = os.environ.get("MYSQL_SSL_MODE", "REQUIRED").upper()
+    if mysql_ssl_mode in {"REQUIRED", "VERIFY_CA", "VERIFY_IDENTITY", "DISABLED", "PREFERRED"}:
+        mysql_options["ssl_mode"] = mysql_ssl_mode
+
     mysql_ssl_ca = mysql_ca_path()
-    if mysql_ssl_ca:
+    if mysql_ssl_ca and mysql_ssl_mode in {"VERIFY_CA", "VERIFY_IDENTITY"}:
         mysql_options["ssl"] = {
             "ca": str(mysql_ssl_ca),
         }
